@@ -30,89 +30,52 @@
         }
     </script>
     <style>
-        /* Custom Styles for styling inputs and scrollbars */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px; width: 16px;
-            border-radius: 50%;
-            background: #064E3B;
-            cursor: pointer;
-            margin-top: -6px;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px;
-            cursor: pointer;
-            background: #E5E7EB;
-            border-radius: 2px;
-        }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #064E3B; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E5E7EB; border-radius: 2px; }
         input[type=range]:focus { outline: none; }
-        
-        /* Monospace inputs */
         input[type=number] { font-family: 'IBM Plex Mono', monospace; }
-        
-        /* Hide scrollbar for clean UI but keep functionality */
         .hide-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .hide-scroll::-webkit-scrollbar-track { background: transparent; }
         .hide-scroll::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
         .hide-scroll::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
-
-        /* Toast Animation */
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(10px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
+        @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(10px); } 10% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-10px); } }
         .toast { animation: fadeInOut 3s forwards; }
     </style>
 
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
-    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.12.0/umd/Recharts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.10/babel.min.js"></script>
 </head>
 <body class="bg-white text-charcoal font-sans antialiased selection:bg-emerald-900 selection:text-white">
-    <div id="root"></div>
+    
+    <div id="root">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500 font-sans">
+            <p>Loading Projection Studio... (If this stays on screen, check your internet connection for external libraries)</p>
+        </div>
+    </div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
         const { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = window.Recharts;
 
-        // --- Icons ---
         const IconTrendingUp = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>;
         const IconDownload = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>;
         const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>;
 
-        // --- Defaults & URL Mapping ---
-        const DEFAULT_PARAMS = {
-            l: 500000, s: 25000, su: 10, r: 12, d: 30, ss: 20, ws: 25, wr: 8, sw: 0, swu: 5, c: 'INR'
-        };
+        const DEFAULT_PARAMS = { l: 500000, s: 25000, su: 10, r: 12, d: 30, ss: 20, ws: 25, wr: 8, sw: 0, swu: 5, c: 'INR' };
+        const PARAMS_MAP = { lumpsum: 'l', sip: 's', sipStep: 'su', rate: 'r', duration: 'd', sipStop: 'ss', wdStart: 'ws', wdRate: 'wr', swp: 'sw', swpStep: 'swu', currency: 'c' };
 
-        const PARAMS_MAP = {
-            lumpsum: 'l', sip: 's', sipStep: 'su', rate: 'r', duration: 'd',
-            sipStop: 'ss', wdStart: 'ws', wdRate: 'wr', swp: 'sw', swpStep: 'swu', currency: 'c'
-        };
-
-        // --- Helper: Format Currency ---
         const formatCurrency = (val, currency) => {
             const locales = { INR: 'en-IN', USD: 'en-US', EUR: 'en-DE' };
-            return new Intl.NumberFormat(locales[currency], {
-                style: 'currency',
-                currency: currency,
-                maximumFractionDigits: 0
-            }).format(val);
+            return new Intl.NumberFormat(locales[currency], { style: 'currency', currency: currency, maximumFractionDigits: 0 }).format(val);
         };
 
-        // --- Main Component ---
         const WealthStudio = () => {
-            // State
             const [params, setParams] = useState({
                 lumpsum: DEFAULT_PARAMS.l, sip: DEFAULT_PARAMS.s, sipStep: DEFAULT_PARAMS.su, rate: DEFAULT_PARAMS.r, duration: DEFAULT_PARAMS.d,
                 sipStop: DEFAULT_PARAMS.ss, wdStart: DEFAULT_PARAMS.ws, wdRate: DEFAULT_PARAMS.wr, swp: DEFAULT_PARAMS.sw, swpStep: DEFAULT_PARAMS.swu
@@ -120,10 +83,6 @@
             const [currency, setCurrency] = useState(DEFAULT_PARAMS.c);
             const [toast, setToast] = useState(null);
 
-            const reportRef = useRef(null);
-            const tableRef = useRef(null);
-
-            // Hydrate from URL
             useEffect(() => {
                 const searchParams = new URLSearchParams(window.location.search);
                 if (Array.from(searchParams.keys()).length > 0) {
@@ -141,7 +100,6 @@
                 }
             }, []);
 
-            // Sync to URL
             useEffect(() => {
                 const searchParams = new URLSearchParams();
                 for (const [key, shortKey] of Object.entries(PARAMS_MAP)) {
@@ -169,12 +127,10 @@
                 showToast("Generating PDF...");
 
                 try {
-                    // Capture Page 1: Dashboard & Charts
                     const dashboardEl = document.getElementById('pdf-dashboard');
                     const canvas1 = await html2canvas(dashboardEl, { scale: 2, useCORS: true });
                     const imgData1 = canvas1.toDataURL('image/png');
-                    const ratio1 = canvas1.height / canvas1.width;
-                    const height1 = pageWidth * ratio1;
+                    const height1 = pageWidth * (canvas1.height / canvas1.width);
                     
                     pdf.setFont("helvetica", "bold");
                     pdf.setFontSize(16);
@@ -182,39 +138,31 @@
                     pdf.setFontSize(10);
                     pdf.setFont("helvetica", "normal");
                     pdf.text("Wealth Projection Studio Report", 15, 20);
-                    
                     pdf.addImage(imgData1, 'PNG', 10, 25, pageWidth - 20, height1 - 20);
                     pdf.text("This projection is illustrative.", 15, pageHeight - 10);
 
-                    // Capture Page 2: Table
                     pdf.addPage();
                     const tableContainer = document.getElementById('pdf-table-container');
                     const originalMaxHeight = tableContainer.style.maxHeight;
                     const originalOverflow = tableContainer.style.overflow;
-                    
-                    // Expand table for full capture
                     tableContainer.style.maxHeight = 'none';
                     tableContainer.style.overflow = 'visible';
                     
                     const canvas2 = await html2canvas(tableContainer, { scale: 2, useCORS: true });
                     const imgData2 = canvas2.toDataURL('image/png');
                     const ratio2 = canvas2.height / canvas2.width;
-                    let height2 = pageWidth * ratio2;
                     
-                    // Restore table
                     tableContainer.style.maxHeight = originalMaxHeight;
                     tableContainer.style.overflow = originalOverflow;
 
                     pdf.text("Year-by-Year Breakdown", 15, 15);
                     
-                    // Scale down if table is extremely long
-                    let renderHeight = height2;
+                    let renderHeight = pageWidth * ratio2;
                     let renderWidth = pageWidth - 20;
                     if(renderHeight > pageHeight - 30) {
                        renderHeight = pageHeight - 30;
                        renderWidth = renderHeight / ratio2;
                     }
-
                     pdf.addImage(imgData2, 'PNG', 10, 20, renderWidth, renderHeight);
                     pdf.text("This projection is illustrative.", 15, pageHeight - 10);
 
@@ -226,11 +174,8 @@
                 }
             };
 
-            const handleChange = (key, value) => {
-                setParams(prev => ({ ...prev, [key]: Number(value) }));
-            };
+            const handleChange = (key, value) => setParams(prev => ({ ...prev, [key]: Number(value) }));
 
-            // Calculation Logic
             const projection = useMemo(() => {
                 let corpus = params.lumpsum;
                 let totalInvested = params.lumpsum;
@@ -241,17 +186,15 @@
 
                 const mRateAcc = Math.pow(1 + params.rate/100, 1/12) - 1;
                 const mRateWd = Math.pow(1 + params.wdRate/100, 1/12) - 1;
-
                 const yearlyData = [];
 
                 for (let y = 1; y <= params.duration; y++) {
-                    let yearlySip = 0;
-                    let yearlySwp = 0;
+                    let yearlySip = 0, yearlySwp = 0;
 
                     for (let m = 1; m <= 12; m++) {
-                        let phase = 1; // Accumulation with SIP
-                        if (y > params.sipStop && y <= params.wdStart) phase = 2; // Accumulation no SIP
-                        else if (y > params.wdStart) phase = 3; // Withdrawal
+                        let phase = 1; 
+                        if (y > params.sipStop && y <= params.wdStart) phase = 2; 
+                        else if (y > params.wdStart) phase = 3; 
 
                         let mRate = (phase === 3) ? mRateWd : mRateAcc;
 
@@ -260,36 +203,27 @@
                             corpus += currentSip;
                             yearlySip += currentSip;
                         }
-
                         if (phase === 3 && currentSwp > 0) {
                             corpus -= currentSwp;
                             if (corpus < 0) corpus = 0;
                             totalSwp += currentSwp;
                             yearlySwp += currentSwp;
                         }
-
                         corpus *= (1 + mRate);
                     }
 
                     if (y === params.sipStop) sipStopCorpus = corpus;
 
                     yearlyData.push({
-                        year: y,
-                        sip: yearlySip,
-                        invested: totalInvested,
-                        withdrawn: totalSwp,
-                        returns: Math.max(0, corpus - totalInvested + totalSwp),
-                        corpus: corpus
+                        year: y, sip: yearlySip, invested: totalInvested, withdrawn: totalSwp,
+                        returns: Math.max(0, corpus - totalInvested + totalSwp), corpus: corpus
                     });
 
-                    // Annual step ups at end of year
                     if (y <= params.sipStop) currentSip *= (1 + params.sipStep/100);
                     if (y > params.wdStart) currentSwp *= (1 + params.swpStep/100);
                 }
 
-                if (params.sipStop > params.duration) {
-                    sipStopCorpus = yearlyData[yearlyData.length-1]?.corpus || 0;
-                }
+                if (params.sipStop > params.duration) sipStopCorpus = yearlyData[yearlyData.length-1]?.corpus || 0;
 
                 const finalCorpus = yearlyData[yearlyData.length-1]?.corpus || 0;
                 const totalReturns = (finalCorpus + totalSwp) - totalInvested;
@@ -298,7 +232,6 @@
                 return { yearlyData, totalInvested, sipStopCorpus, totalSwp, finalCorpus, totalReturns, wealthMultiplier };
             }, [params]);
 
-            // Formatter for charts
             const formatAxis = (tickItem) => {
                 if (tickItem >= 10000000) return (tickItem / 10000000).toFixed(1) + 'Cr';
                 if (tickItem >= 100000) return (tickItem / 100000).toFixed(1) + 'L';
@@ -308,50 +241,30 @@
 
             return (
                 <div className="min-h-screen flex flex-col bg-white">
-                    {/* Header */}
                     <header className="border-b border-gray-200 sticky top-0 bg-white/90 backdrop-blur-sm z-50">
                         <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 border border-emerald-900 flex items-center justify-center text-emerald-900">
-                                    <IconTrendingUp />
-                                </div>
+                                <div className="w-8 h-8 border border-emerald-900 flex items-center justify-center text-emerald-900"><IconTrendingUp /></div>
                                 <div>
                                     <h1 className="text-xs uppercase tracking-[0.2em] font-semibold text-charcoal">Heritage Wealth · Private Office</h1>
                                     <p className="font-serif italic text-secondary text-sm">Wealth Projection Studio</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
-                                <select 
-                                    data-testid="currency-toggle"
-                                    className="border border-gray-300 rounded-none text-sm px-2 py-1 font-mono focus:outline-none focus:border-emerald-900"
-                                    value={currency} 
-                                    onChange={(e) => setCurrency(e.target.value)}
-                                >
+                                <select data-testid="currency-toggle" className="border border-gray-300 rounded-none text-sm px-2 py-1 font-mono focus:outline-none focus:border-emerald-900" value={currency} onChange={(e) => setCurrency(e.target.value)}>
                                     <option value="INR">₹ INR</option>
                                     <option value="USD">$ USD</option>
                                     <option value="EUR">€ EUR</option>
                                 </select>
-                                <button data-testid="share-btn" onClick={handleShare} className="flex items-center gap-2 text-sm font-medium border border-gray-300 px-4 py-1.5 hover:bg-gray-50 transition-colors">
-                                    <IconShare /> Share Scenario
-                                </button>
-                                <button data-testid="download-btn" onClick={handleDownload} className="flex items-center gap-2 text-sm font-medium bg-emerald-900 text-white border border-emerald-900 px-4 py-1.5 hover:bg-emerald-800 transition-colors">
-                                    <IconDownload /> Download Report
-                                </button>
+                                <button data-testid="share-btn" onClick={handleShare} className="flex items-center gap-2 text-sm font-medium border border-gray-300 px-4 py-1.5 hover:bg-gray-50 transition-colors"><IconShare /> Share Scenario</button>
+                                <button data-testid="download-btn" onClick={handleDownload} className="flex items-center gap-2 text-sm font-medium bg-emerald-900 text-white border border-emerald-900 px-4 py-1.5 hover:bg-emerald-800 transition-colors"><IconDownload /> Download Report</button>
                             </div>
                         </div>
                     </header>
 
-                    {/* Toast */}
-                    {toast && (
-                        <div className="fixed bottom-4 right-4 bg-charcoal text-white px-6 py-3 shadow-lg font-medium text-sm z-50 toast">
-                            {toast}
-                        </div>
-                    )}
+                    {toast && <div className="fixed bottom-4 right-4 bg-charcoal text-white px-6 py-3 shadow-lg font-medium text-sm z-50 toast">{toast}</div>}
 
-                    {/* Main Layout */}
                     <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 py-8 flex flex-col lg:flex-row gap-12 items-start relative">
-                        
-                        {/* LEFT: Parameters (~4/12) */}
                         <aside className="w-full lg:w-4/12 lg:sticky lg:top-24 max-h-[calc(100vh-8rem)] overflow-y-auto hide-scroll pr-4 space-y-8 pb-12">
                             <div>
                                 <h2 className="font-serif text-2xl text-charcoal border-b border-gray-200 pb-2 mb-6">Accumulation Phase</h2>
@@ -365,7 +278,6 @@
                                     <InputGroup label="Withdrawal Start Year" val={params.wdStart} min={1} max={params.duration} step={1} onChange={(v) => handleChange('wdStart', v)} suffix="y" testid="input-wd-start" />
                                 </div>
                             </div>
-
                             <div>
                                 <h2 className="font-serif text-2xl text-charcoal border-b border-gray-200 pb-2 mb-6">Withdrawal Phase</h2>
                                 <div className="space-y-6">
@@ -376,9 +288,7 @@
                             </div>
                         </aside>
 
-                        {/* RIGHT: Projection (~8/12) */}
                         <section className="w-full lg:w-8/12 space-y-8" id="pdf-dashboard">
-                            {/* Summary Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <MetricCard title="Total Investment" value={projection.totalInvested} currency={currency} testid="metric-invested" />
                                 <MetricCard title={`Corpus @ SIP Stop · Yr ${params.sipStop}`} value={projection.sipStopCorpus} currency={currency} testid="metric-sip-stop" />
@@ -386,19 +296,11 @@
                                 <MetricCard title={`Final Corpus · Yr ${params.duration}`} value={projection.finalCorpus} currency={currency} highlight testid="metric-final" />
                             </div>
 
-                            {/* Supporting Strip */}
                             <div className="flex flex-wrap gap-8 py-3 border-y border-gray-200 text-sm">
-                                <div>
-                                    <span className="text-secondary mr-2">Total Returns:</span>
-                                    <span className="font-mono font-medium text-emerald-900" data-testid="metric-total-returns">{formatCurrency(projection.totalReturns, currency)}</span>
-                                </div>
-                                <div>
-                                    <span className="text-secondary mr-2">Wealth Multiplier:</span>
-                                    <span className="font-mono font-medium text-charcoal" data-testid="metric-multiplier">{projection.wealthMultiplier}x</span>
-                                </div>
+                                <div><span className="text-secondary mr-2">Total Returns:</span><span className="font-mono font-medium text-emerald-900" data-testid="metric-total-returns">{formatCurrency(projection.totalReturns, currency)}</span></div>
+                                <div><span className="text-secondary mr-2">Wealth Multiplier:</span><span className="font-mono font-medium text-charcoal" data-testid="metric-multiplier">{projection.wealthMultiplier}x</span></div>
                             </div>
 
-                            {/* Charts */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[400px]">
                                 <div className="border border-gray-200 p-4 relative">
                                     <h3 className="text-xs uppercase tracking-wider text-secondary mb-4 font-semibold absolute top-4 left-4 z-10">Year-over-Year Growth</h3>
@@ -428,18 +330,10 @@
                                 </div>
                             </div>
 
-                            {/* Table */}
                             <div id="pdf-table-container" className="border border-gray-200 max-h-[600px] overflow-y-auto hide-scroll">
                                 <table className="w-full text-sm text-right font-mono border-collapse">
                                     <thead className="bg-gray-50 text-secondary sticky top-0 border-b border-gray-200 z-10 text-xs uppercase tracking-wider">
-                                        <tr>
-                                            <th className="py-3 px-4 font-medium text-left">Year</th>
-                                            <th className="py-3 px-4 font-medium">SIP (Year)</th>
-                                            <th className="py-3 px-4 font-medium">Total Invested</th>
-                                            <th className="py-3 px-4 font-medium">Withdrawn</th>
-                                            <th className="py-3 px-4 font-medium">Returns</th>
-                                            <th className="py-3 px-4 font-medium text-charcoal">Corpus</th>
-                                        </tr>
+                                        <tr><th className="py-3 px-4 font-medium text-left">Year</th><th className="py-3 px-4 font-medium">SIP (Year)</th><th className="py-3 px-4 font-medium">Total Invested</th><th className="py-3 px-4 font-medium">Withdrawn</th><th className="py-3 px-4 font-medium">Returns</th><th className="py-3 px-4 font-medium text-charcoal">Corpus</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {projection.yearlyData.map((row) => (
@@ -461,45 +355,27 @@
             );
         };
 
-        // --- Sub-components ---
-        const InputGroup = ({ label, val, min, max, step, onChange, curr, suffix, testid }) => {
-            return (
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center">
-                        <label className="text-sm font-medium text-secondary">{label}</label>
-                        <div className="relative">
-                            {curr && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-sm">{curr === 'INR' ? '₹' : curr === 'USD' ? '$' : '€'}</span>}
-                            <input 
-                                type="number" 
-                                value={val} 
-                                onChange={(e) => onChange(e.target.value)}
-                                className={`w-28 text-right border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-emerald-900 focus:ring-1 focus:ring-emerald-900 transition-shadow ${curr ? 'pl-6' : ''} ${suffix ? 'pr-6' : ''}`}
-                                data-testid={`${testid}-number`}
-                            />
-                            {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-sm">{suffix}</span>}
-                        </div>
+        const InputGroup = ({ label, val, min, max, step, onChange, curr, suffix, testid }) => (
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium text-secondary">{label}</label>
+                    <div className="relative">
+                        {curr && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-sm">{curr === 'INR' ? '₹' : curr === 'USD' ? '$' : '€'}</span>}
+                        <input type="number" value={val} onChange={(e) => onChange(e.target.value)} className={`w-28 text-right border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-emerald-900 focus:ring-1 focus:ring-emerald-900 transition-shadow ${curr ? 'pl-6' : ''} ${suffix ? 'pr-6' : ''}`} data-testid={`${testid}-number`} />
+                        {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-sm">{suffix}</span>}
                     </div>
-                    <input 
-                        type="range" 
-                        min={min} max={max} step={step} 
-                        value={val} 
-                        onChange={(e) => onChange(e.target.value)}
-                        data-testid={`${testid}-slider`}
-                    />
                 </div>
-            );
-        };
+                <input type="range" min={min} max={max} step={step} value={val} onChange={(e) => onChange(e.target.value)} data-testid={`${testid}-slider`} />
+            </div>
+        );
 
         const MetricCard = ({ title, value, currency, highlight, testid }) => (
             <div className={`p-5 border ${highlight ? 'border-emerald-900 border-2 bg-emerald-50/30' : 'border-gray-200'} flex flex-col justify-between`} data-testid={testid}>
                 <h4 className={`text-xs uppercase tracking-wider mb-2 font-semibold ${highlight ? 'text-emerald-900' : 'text-secondary'}`}>{title}</h4>
-                <div className={`font-serif text-2xl truncate ${highlight ? 'text-emerald-900 font-semibold' : 'text-charcoal'}`}>
-                    {formatCurrency(value, currency)}
-                </div>
+                <div className={`font-serif text-2xl truncate ${highlight ? 'text-emerald-900 font-semibold' : 'text-charcoal'}`}>{formatCurrency(value, currency)}</div>
             </div>
         );
 
-        // --- Render ---
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<WealthStudio />);
     </script>
