@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Heritage Wealth · Private Office — Wealth Projection Studio</title>
+<meta name="description" content="Model decades of disciplined investing — lumpsum, SIPs with annual step-ups, a quiet compounding period, and a withdrawal phase — in a single, deliberate view." />
+<meta property="og:title" content="Heritage Wealth · Private Office — Wealth Projection Studio" />
+<meta property="og:description" content="Model decades of disciplined investing — lumpsum, SIPs with step-ups, compounding periods, and SWP withdrawal phases." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Heritage Wealth · Wealth Projection Studio" />
+<meta name="theme-color" content="#064E3B" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23064E3B'/><polyline points='20,65 40,40 60,52 80,25' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --emerald:#064E3B;--emerald-hover:#047857;--emerald-light:#D1FAE5;--emerald-mid:#10B981;
+    --charcoal:#111827;--secondary:#4B5563;--tertiary:#9CA3AF;--border:#E5E7EB;--border-strong:#D1D5DB;
+    --bg:#FFFFFF;--bg-secondary:#F9FAFB;--bg-tertiary:#F3F4F6;
+    --font-serif:'Cormorant Garamond',Georgia,serif;
+    --font-sans:'Work Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  html,body,#root{height:100%;margin:0}
+  body{font-family:var(--font-sans);background:#F8F7F4;color:var(--charcoal);-webkit-font-smoothing:antialiased}
+  .app-wrap{min-height:100vh;display:flex;flex-direction:column}
+
+  /* HEADER */
+  .site-header{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand-icon{width:34px;height:34px;border:1.5px solid var(--emerald);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .brand-icon svg{width:16px;height:16px;stroke:var(--emerald);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand-text{display:flex;flex-direction:column;gap:1px}
+  .brand-wordmark{font-family:var(--font-sans);font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--charcoal)}
+  .brand-tagline{font-family:var(--font-serif);font-size:12px;color:var(--secondary);font-style:italic;line-height:1.3;max-width:420px}
+  .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+  /* CURRENCY TOGGLE */
+  .currency-group{display:flex;border:1px solid var(--border-strong);overflow:hidden}
+  .currency-btn{font-family:var(--font-mono);font-size:11px;padding:5px 10px;background:var(--bg);border:none;cursor:pointer;color:var(--secondary);transition:all .15s;font-weight:500}
+  .currency-btn.active{background:var(--charcoal);color:#fff}
+  .currency-btn:hover:not(.active){background:var(--bg-secondary)}
+
+  /* MAIN LAYOUT */
+  .main-layout{display:grid;grid-template-columns:340px 1fr;flex:1;align-items:start}
+  .params-panel{background:var(--bg);border-right:1px solid var(--border);padding:1.5rem;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+  .proj-panel{padding:2rem;min-width:0}
+
+  /* PARAMS */
+  .panel-title{font-family:var(--font-serif);font-size:20px;font-weight:600;color:var(--charcoal);margin-bottom:1.25rem;letter-spacing:.01em}
+  .param-group{margin-bottom:1rem}
+  .param-group-title{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--tertiary);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  .param-row{margin-bottom:.875rem}
+  .param-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:8px}
+  .param-label span:first-child{font-size:12px;color:var(--secondary);font-weight:500;white-space:nowrap}
+  .param-value{font-family:var(--font-mono);font-size:12px;color:var(--charcoal);font-weight:500;background:var(--bg-secondary);border:1px solid var(--border);padding:2px 6px;min-width:80px;max-width:90px;text-align:right;outline:none}
+  .param-value:focus{outline:2px solid var(--emerald);outline-offset:-1px;border-color:var(--emerald)}
+  .slider-wrap{position:relative;height:20px;display:flex;align-items:center}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:var(--border-strong);outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--emerald);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--emerald);cursor:pointer;transition:transform .1s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--emerald);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--emerald);cursor:pointer}
+  input[type=range]:focus{outline:none}
+  input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(6,78,59,.25)}
+  .withdrawal-section{background:var(--bg-secondary);border:1px solid var(--border);padding:1rem;margin-top:.5rem}
+  .withdrawal-title{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--emerald);margin-bottom:.875rem}
+
+  /* METRIC CARDS */
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .metric-card{background:var(--bg);border:1px solid var(--border);padding:16px;position:relative;transition:border-color .2s}
+  .metric-card:hover{border-color:var(--border-strong)}
+  .metric-card.accent{border:1.5px solid var(--emerald)}
+  .metric-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tertiary);margin-bottom:8px;line-height:1.4}
+  .metric-value{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--charcoal);line-height:1.2;word-break:break-all}
+  .metric-card.accent .metric-value{color:var(--emerald)}
+  .metric-sub{font-family:var(--font-mono);font-size:10px;color:var(--tertiary);margin-top:4px}
+  .support-strip{display:flex;gap:24px;flex-wrap:wrap;padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border);margin-bottom:24px}
+  .support-item{display:flex;flex-direction:column;gap:3px}
+  .support-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tertiary);font-weight:500}
+  .support-value{font-family:var(--font-mono);font-size:13px;color:var(--charcoal);font-weight:500}
+
+  /* CHARTS */
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+  .chart-card{background:var(--bg);border:1px solid var(--border);padding:16px}
+  .chart-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--charcoal);margin-bottom:3px}
+  .chart-sub{font-size:11px;color:var(--tertiary);margin-bottom:14px}
+  .chart-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--secondary)}
+  .legend-dot{width:8px;height:8px;border-radius:0;flex-shrink:0}
+
+  /* TABLE */
+  .table-card{background:var(--bg);border:1px solid var(--border)}
+  .table-header-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+  .table-title{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--charcoal)}
+  .table-wrap{overflow:auto;max-height:420px}
+  table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px}
+  thead{position:sticky;top:0;background:var(--bg-secondary);z-index:1}
+  th{padding:8px 12px;text-align:right;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tertiary);border-bottom:1px solid var(--border);white-space:nowrap}
+  th:first-child{text-align:left}
+  td{padding:7px 12px;text-align:right;color:var(--secondary);border-bottom:1px solid var(--bg-secondary)}
+  td:first-child{text-align:left;color:var(--charcoal);font-weight:500}
+  tr:hover td{background:var(--bg-secondary)}
+  tr.phase-1 td:first-child{border-left:2px solid var(--tertiary)}
+  tr.phase-2 td:first-child{border-left:2px solid #93C5FD}
+  tr.phase-3 td:first-child{border-left:2px solid var(--emerald-mid)}
+
+  /* BUTTONS */
+  .btn{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:8px 14px;border:1px solid var(--border-strong);background:var(--bg);color:var(--charcoal);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;text-decoration:none}
+  .btn:hover{background:var(--bg-secondary)}
+  .btn:active{opacity:.85}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+  .btn-primary:hover:not(:disabled){background:var(--emerald-hover);border-color:var(--emerald-hover)}
+  .btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--charcoal);color:#fff;padding:10px 16px;font-size:12px;font-family:var(--font-sans);z-index:9999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:320px}
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  /* FOOTER */
+  .site-footer{background:var(--bg);border-top:1px solid var(--border);padding:16px 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .footer-text{font-size:11px;color:var(--tertiary)}
+  .footer-disclaimer{font-size:10px;color:var(--tertiary);font-style:italic;max-width:600px;text-align:right}
+
+  /* PHASE LEGEND */
+  .phase-legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .phase-pip{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--tertiary)}
+  .phase-pip-dot{width:8px;height:8px;flex-shrink:0}
+
+  /* RECHARTS overrides */
+  .recharts-cartesian-axis-tick-value{font-family:'IBM Plex Mono',monospace!important;font-size:9px!important}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong)}
+
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .main-layout{grid-template-columns:1fr}
+    .params-panel{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+    .metrics-grid{grid-template-columns:repeat(2,1fr)}
+    .charts-row{grid-template-columns:1fr}
+    .brand-tagline{display:none}
+    .header-right{gap:4px}
+    .site-header{padding:0 1rem}
+    .proj-panel{padding:1rem}
+  }
+  @media(max-width:540px){
+    .metrics-grid{grid-template-columns:1fr 1fr}
+    .currency-btn{padding:5px 7px;font-size:10px}
+    .btn{font-size:11px;padding:7px 10px}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var _React = React;
+  var _ReactDOM = ReactDOM;
+  var _Recharts = Recharts;
+
+  const {useState,useEffect,useRef,useCallback,useMemo}=_React;
+  const {LineChart,Line,AreaChart,Area,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer}=_Recharts;
+
+  const CURRENCIES={
+    INR:{sym:'₹',code:'INR',locale:'en-IN'},
+    USD:{sym:'$',code:'USD',locale:'en-US'},
+    EUR:{sym:'€',code:'EUR',locale:'de-DE'}
+  };
+
+  const DEFAULTS={
+    lumpsum:500000,sip:25000,stepUp:10,annualReturn:12,duration:30,
+    sipStopYear:20,withdrawalStartYear:25,withdrawalReturn:8,
+    swp:0,swpStepUp:5,currency:'INR'
+  };
+
+  function parseParams(){
+    try{
+      const p=new URLSearchParams(window.location.search);
+      if(!p.has('ls'))return null;
+      return{
+        lumpsum:+p.get('ls')||DEFAULTS.lumpsum,
+        sip:+p.get('sp')||DEFAULTS.sip,
+        stepUp:+p.get('su')||DEFAULTS.stepUp,
+        annualReturn:+p.get('ar')||DEFAULTS.annualReturn,
+        duration:+p.get('dur')||DEFAULTS.duration,
+        sipStopYear:+p.get('ssy')||DEFAULTS.sipStopYear,
+        withdrawalStartYear:+p.get('wsy')||DEFAULTS.withdrawalStartYear,
+        withdrawalReturn:+p.get('wr')||DEFAULTS.withdrawalReturn,
+        swp:+p.get('swp')||DEFAULTS.swp,
+        swpStepUp:+p.get('stu')||DEFAULTS.swpStepUp,
+        currency:p.get('cur')||DEFAULTS.currency
+      };
+    }catch(e){return null}
+  }
+
+  function fmtNum(val,cur){
+    const c=CURRENCIES[cur]||CURRENCIES.INR;
+    if(cur==='INR'){
+      if(val>=10000000)return c.sym+(val/10000000).toFixed(2)+' Cr';
+      if(val>=100000)return c.sym+(val/100000).toFixed(2)+' L';
+      if(val>=1000)return c.sym+(val/1000).toFixed(1)+'K';
+      return c.sym+Math.round(val).toLocaleString();
+    }
+    if(val>=1000000000)return c.sym+(val/1000000000).toFixed(2)+'B';
+    if(val>=1000000)return c.sym+(val/1000000).toFixed(2)+'M';
+    if(val>=1000)return c.sym+(val/1000).toFixed(1)+'K';
+    return c.sym+Math.round(val).toLocaleString();
+  }
+
+  function fmtFull(val,cur){
+    const c=CURRENCIES[cur]||CURRENCIES.INR;
+    return c.sym+Math.round(val).toLocaleString(c.locale);
+  }
+
+  function showToast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3500);
+  }
+
+  function calcProjection(p){
+    const{lumpsum,sip,stepUp,annualReturn,duration,sipStopYear,withdrawalStartYear,withdrawalReturn,swp,swpStepUp}=p;
+    const mRate=(Math.pow(1+annualReturn/100,1/12)-1);
+    const mRateW=(Math.pow(1+withdrawalReturn/100,1/12)-1);
+    let corpus=lumpsum;
+    let totalInvested=lumpsum;
+    let totalWithdrawn=0;
+    let corpusAtSipStop=0;
+    const rows=[];
+    let curSip=sip;
+    let curSwp=swp;
+
+    for(let yr=1;yr<=duration;yr++){
+      let sipThisYear=0;
+      let withdrawnThisYear=0;
+      const isAccum=yr<=sipStopYear;
+      const isWithdrawal=yr>=withdrawalStartYear;
+      if(yr>1&&isAccum){curSip=curSip*(1+stepUp/100)}
+      if(yr>withdrawalStartYear&&isWithdrawal&&swp>0){curSwp=curSwp*(1+swpStepUp/100)}
+      const rate=isWithdrawal?mRateW:mRate;
+      for(let m=1;m<=12;m++){
+        if(isAccum){corpus+=curSip;sipThisYear+=curSip;totalInvested+=curSip}
+        corpus*=(1+rate);
+        if(isWithdrawal&&swp>0){const w=Math.min(curSwp,corpus);corpus-=w;withdrawnThisYear+=w;totalWithdrawn+=w}
+      }
+      if(yr===sipStopYear)corpusAtSipStop=corpus;
+      const returns=corpus-(totalInvested-totalWithdrawn);
+      rows.push({
+        year:yr,sip:sipThisYear,totalInvested,
+        withdrawn:withdrawnThisYear,
+        returns:Math.max(0,returns),
+        corpus:Math.max(0,corpus)
+      });
+      corpus=Math.max(0,corpus);
+    }
+    const finalCorpus=rows.length>0?rows[rows.length-1].corpus:0;
+    const totalReturns=finalCorpus+totalWithdrawn-totalInvested;
+    const multiplier=totalInvested>0?(finalCorpus+totalWithdrawn)/totalInvested:0;
+    if(sipStopYear>=duration&&rows.length>0)corpusAtSipStop=rows[rows.length-1].corpus;
+    return{rows,totalInvested,corpusAtSipStop,totalWithdrawn,finalCorpus,totalReturns,multiplier};
+  }
+
+  function SliderInput({label,value,min,max,step,onChange,format,testId}){
+    const [editing,setEditing]=useState(false);
+    const [draft,setDraft]=useState('');
+    const fmtVal=format?format(value):(typeof value==='number'?value.toLocaleString():String(value));
+
+    function handleBlur(){
+      setEditing(false);
+      const raw=parseFloat(draft.replace(/[^0-9.]/g,''));
+      if(!isNaN(raw)){
+        const clamped=Math.max(min,Math.min(max,raw));
+        onChange(step<1?parseFloat(clamped.toFixed(1)):Math.round(clamped));
+      }
+    }
+
+    return _React.createElement('div',{className:'param-row'},
+      _React.createElement('div',{className:'param-label'},
+        _React.createElement('span',null,label),
+        _React.createElement('input',{
+          className:'param-value',
+          type:'text',
+          'data-testid':testId+'-input',
+          value:editing?draft:fmtVal,
+          onFocus:()=>{setEditing(true);setDraft(String(value))},
+          onChange:e=>setDraft(e.target.value),
+          onBlur:handleBlur,
+          onKeyDown:e=>{if(e.key==='Enter')e.target.blur()}
+        })
+      ),
+      _React.createElement('div',{className:'slider-wrap'},
+        _React.createElement('input',{
+          type:'range',min:min,max:max,step:step||1,value:value,
+          'data-testid':testId+'-slider',
+          onChange:e=>onChange(+e.target.value)
+        })
+      )
+    );
+  }
+
+  function MetricCard({label,value,sub,accent,testId}){
+    return _React.createElement('div',{className:'metric-card'+(accent?' accent':''),'data-testid':testId},
+      _React.createElement('div',{className:'metric-label'},label),
+      _React.createElement('div',{className:'metric-value','data-testid':testId+'-value'},value),
+      sub&&_React.createElement('div',{className:'metric-sub'},sub)
+    );
+  }
+
+  function App(){
+    const urlParams=useMemo(()=>parseParams(),[]);
+    const init=urlParams||DEFAULTS;
+
+    const [lumpsum,setLumpsum]=useState(init.lumpsum);
+    const [sip,setSip]=useState(init.sip);
+    const [stepUp,setStepUp]=useState(init.stepUp);
+    const [annualReturn,setAnnualReturn]=useState(init.annualReturn);
+    const [duration,setDuration]=useState(init.duration);
+    const [sipStopYear,setSipStopYear]=useState(init.sipStopYear);
+    const [withdrawalStartYear,setWithdrawalStartYear]=useState(init.withdrawalStartYear);
+    const [withdrawalReturn,setWithdrawalReturn]=useState(init.withdrawalReturn);
+    const [swp,setSwp]=useState(init.swp);
+    const [swpStepUp,setSwpStepUp]=useState(init.swpStepUp);
+    const [currency,setCurrency]=useState(init.currency);
+    const [downloading,setDownloading]=useState(false);
+
+    useEffect(()=>{
+      if(urlParams)showToast('✓ Shared scenario loaded successfully');
+    },[]);
+
+    useEffect(()=>{
+      const params=new URLSearchParams({
+        ls:lumpsum,sp:sip,su:stepUp,ar:annualReturn,dur:duration,
+        ssy:sipStopYear,wsy:withdrawalStartYear,wr:withdrawalReturn,
+        swp:swp,stu:swpStepUp,cur:currency
+      });
+      if(window.history&&window.history.replaceState){
+        window.history.replaceState(null,'','?'+params.toString());
+      }
+    },[lumpsum,sip,stepUp,annualReturn,duration,sipStopYear,withdrawalStartYear,withdrawalReturn,swp,swpStepUp,currency]);
+
+    const proj=useMemo(()=>calcProjection({
+      lumpsum,sip,stepUp,annualReturn,duration,sipStopYear,
+      withdrawalStartYear,withdrawalReturn,swp,swpStepUp
+    }),[lumpsum,sip,stepUp,annualReturn,duration,sipStopYear,withdrawalStartYear,withdrawalReturn,swp,swpStepUp]);
+
+    const chartData=proj.rows.map(r=>({
+      year:r.year,
+      corpus:Math.round(r.corpus),
+      invested:Math.round(r.totalInvested),
+      returns:Math.max(0,Math.round(r.corpus-r.totalInvested+r.withdrawn))
+    }));
+
+    const f=v=>fmtNum(v,currency);
+    const ff=v=>fmtFull(v,currency);
+
+    function handleShare(){
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(window.location.href)
+          .then(()=>showToast('✓ Scenario URL copied to clipboard'))
+          .catch(()=>{
+            prompt('Copy this URL:',window.location.href);
+          });
+      }else{
+        prompt('Copy this URL:',window.location.href);
+      }
+    }
+
+    async function handleDownload(){
+      if(downloading)return;
+      setDownloading(true);
+      try{
+        const{jsPDF}=window.jspdf;
+        const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+        const M=15,W=210,CW=W-M*2;
+
+        // Header
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(18);doc.setTextColor(6,78,59);
+        doc.text('Heritage Wealth \u00B7 Private Office',M,18);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(10);doc.setTextColor(75,85,99);
+        doc.text('Wealth Projection Studio \u2014 Scenario Report',M,25);
+        doc.text('Generated: '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}),M,31);
+        doc.setLineWidth(.3);doc.setDrawColor(229,231,235);
+        doc.line(M,35,W-M,35);
+
+        // Assumptions
+        let y=42;
+        doc.setFontSize(8);doc.setTextColor(156,163,175);doc.setFont('helvetica','bold');
+        doc.text('ASSUMPTIONS',M,y);y+=5;
+        const inputs=[
+          'Currency: '+currency,
+          'Lumpsum: '+ff(lumpsum),
+          'Monthly SIP: '+ff(sip),
+          'SIP Step-Up: '+stepUp+'% p.a.',
+          'Annual Return (Accum.): '+annualReturn+'%',
+          'Duration: '+duration+' yrs',
+          'SIP Stops: Yr '+sipStopYear,
+          'Withdrawal Starts: Yr '+withdrawalStartYear,
+          'Withdrawal Return: '+withdrawalReturn+'%',
+          'Monthly SWP: '+ff(swp),
+          'SWP Step-Up: '+swpStepUp+'% p.a.'
+        ];
+        doc.setFont('helvetica','normal');
+        let col=0,row=0;
+        inputs.forEach((t,i)=>{
+          doc.setFontSize(8);doc.setTextColor(75,85,99);
+          doc.text(t,M+col*65,y+row*6);
+          col++;if(col>=3){col=0;row++}
+        });
+        y+=Math.ceil(inputs.length/3)*6+6;
+        doc.line(M,y,W-M,y);y+=8;
+
+        // Milestones
+        doc.setFontSize(8);doc.setTextColor(156,163,175);doc.setFont('helvetica','bold');
+        doc.text('KEY MILESTONES',M,y);y+=6;
+        const ms=[
+          {l:'Total Investment',v:ff(proj.totalInvested)},
+          {l:'Corpus @ SIP Stop \u00B7 Yr '+sipStopYear,v:ff(proj.corpusAtSipStop)},
+          {l:'Total SWP Withdrawn',v:ff(proj.totalWithdrawn)},
+          {l:'Final Corpus \u00B7 Yr '+duration,v:ff(proj.finalCorpus)},
+          {l:'Total Returns (incl. withdrawn)',v:ff(proj.totalReturns)},
+          {l:'Wealth Multiplier',v:proj.multiplier.toFixed(2)+'\u00D7'}
+        ];
+        ms.forEach((m,i)=>{
+          const bx=M+(i%2)*100,by=y+Math.floor(i/2)*16;
+          doc.setFillColor(249,250,251);doc.rect(bx,by-6,96,14,'F');
+          doc.setFontSize(7);doc.setTextColor(156,163,175);doc.setFont('helvetica','normal');
+          doc.text(m.l,bx+3,by-1);
+          doc.setFontSize(11);doc.setTextColor(17,24,39);doc.setFont('helvetica','bold');
+          doc.text(m.v,bx+3,by+6);
+        });
+        y+=Math.ceil(ms.length/2)*16+6;
+        doc.line(M,y,W-M,y);y+=8;
+
+        // Table header
+        doc.setFontSize(8);doc.setTextColor(156,163,175);doc.setFont('helvetica','bold');
+        doc.text('YEAR-BY-YEAR BREAKDOWN',M,y);y+=6;
+        const cols=['Year','SIP (Yr)','Total Invested','Withdrawn','Returns','Corpus'];
+        const cw=[14,32,38,30,36,36];
+        doc.setFontSize(7);doc.setTextColor(107,114,128);
+        let cx=M;
+        cols.forEach((c,i)=>{doc.text(c,cx,y);cx+=cw[i]});
+        y+=3;doc.line(M,y,W-M,y);y+=4;
+
+        doc.setFont('helvetica','normal');
+        proj.rows.forEach(r=>{
+          if(y>280){
+            doc.addPage();
+            y=20;
+            doc.setFontSize(7);doc.setTextColor(156,163,175);
+            doc.text('This projection is illustrative. Heritage Wealth \u00B7 Private Office',M,286);
+          }
+          const vals=[
+            'Yr '+r.year,
+            r.sip>0?ff(r.sip):'\u2014',
+            ff(r.totalInvested),
+            r.withdrawn>0?ff(r.withdrawn):'\u2014',
+            ff(Math.max(0,r.returns)),
+            ff(r.corpus)
+          ];
+          cx=M;
+          vals.forEach((v,i)=>{
+            doc.setFontSize(7);doc.setTextColor(75,85,99);
+            doc.text(String(v),cx,y);cx+=cw[i];
+          });
+          y+=5;
+        });
+
+        // Footer on last page
+        doc.setFontSize(7);doc.setTextColor(156,163,175);
+        doc.text('This projection is illustrative. Heritage Wealth \u00B7 Private Office',M,286);
+
+        doc.save('heritage-wealth-projection.pdf');
+        showToast('✓ PDF report downloaded');
+      }catch(e){
+        console.error(e);
+        showToast('PDF generation failed — please try again');
+      }
+      setDownloading(false);
+    }
+
+    function handleSetDuration(v){
+      setDuration(v);
+      if(sipStopYear>v)setSipStopYear(v);
+      if(withdrawalStartYear>v)setWithdrawalStartYear(v);
+    }
+    function handleSetSipStop(v){
+      setSipStopYear(v);
+      if(withdrawalStartYear<v)setWithdrawalStartYear(v);
+    }
+
+    // Tooltip formatter
+    const tooltipStyle={fontFamily:"'IBM Plex Mono',monospace",fontSize:'10px',border:'1px solid #E5E7EB',borderRadius:'0',boxShadow:'none',background:'#fff'};
+    const tooltipFmt=(v,n)=>[ff(v),n];
+    const tickStyle={fontFamily:"'IBM Plex Mono',monospace",fontSize:9,fill:'#9CA3AF'};
+
+    return _React.createElement('div',{className:'app-wrap'},
+
+      // HEADER
+      _React.createElement('header',{className:'site-header'},
+        _React.createElement('div',{className:'brand'},
+          _React.createElement('div',{className:'brand-icon'},
+            _React.createElement('svg',{viewBox:'0 0 24 24','aria-hidden':'true'},
+              _React.createElement('polyline',{points:'22 7 13.5 15.5 8.5 10.5 2 17'}),
+              _React.createElement('polyline',{points:'16 7 22 7 22 13'})
+            )
+          ),
+          _React.createElement('div',{className:'brand-text'},
+            _React.createElement('div',{className:'brand-wordmark'},'Heritage Wealth \u00B7 Private Office'),
+            _React.createElement('div',{className:'brand-tagline'},'Model decades of disciplined investing \u2014 lumpsum, SIPs with annual step-ups, a quiet compounding period, and a withdrawal phase \u2014 in a single, deliberate view.')
+          )
+        ),
+        _React.createElement('div',{className:'header-right'},
+          _React.createElement('div',{className:'currency-group','aria-label':'Currency selector'},
+            ['INR','USD','EUR'].map(c=>
+              _React.createElement('button',{
+                key:c,
+                className:'currency-btn'+(currency===c?' active':''),
+                'data-testid':'currency-'+c,
+                onClick:()=>setCurrency(c),
+                'aria-pressed':currency===c,
+                title:'Switch to '+c
+              },CURRENCIES[c].sym+' '+c)
+            )
+          ),
+          _React.createElement('button',{
+            className:'btn',onClick:handleShare,
+            'data-testid':'btn-share','aria-label':'Share scenario URL'
+          },
+            _React.createElement('svg',{viewBox:'0 0 24 24','aria-hidden':'true'},
+              _React.createElement('circle',{cx:'18',cy:'5',r:'3'}),
+              _React.createElement('circle',{cx:'6',cy:'12',r:'3'}),
+              _React.createElement('circle',{cx:'18',cy:'19',r:'3'}),
+              _React.createElement('line',{x1:'8.59',y1:'13.51',x2:'15.42',y2:'17.49'}),
+              _React.createElement('line',{x1:'15.41',y1:'6.51',x2:'8.59',y2:'10.49'})
+            ),
+            'Share'
+          ),
+          _React.createElement('button',{
+            className:'btn btn-primary',onClick:handleDownload,
+            'data-testid':'btn-download',disabled:downloading,
+            'aria-label':'Download PDF report'
+          },
+            _React.createElement('svg',{viewBox:'0 0 24 24','aria-hidden':'true'},
+              _React.createElement('path',{d:'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4'}),
+              _React.createElement('polyline',{points:'7 10 12 15 17 10'}),
+              _React.createElement('line',{x1:'12',y1:'15',x2:'12',y2:'3'})
+            ),
+            downloading?'Generating\u2026':'Download PDF'
+          )
+        )
+      ),
+
+      // MAIN
+      _React.createElement('div',{className:'main-layout'},
+
+        // LEFT PARAMS PANEL
+        _React.createElement('aside',{className:'params-panel','aria-label':'Projection parameters'},
+          _React.createElement('div',{className:'panel-title'},'Parameters'),
+
+          _React.createElement('div',{className:'param-group'},
+            _React.createElement('div',{className:'param-group-title'},'Accumulation Phase'),
+            _React.createElement(SliderInput,{label:'Lumpsum Invested',value:lumpsum,min:0,max:10000000,step:10000,onChange:setLumpsum,format:v=>fmtNum(v,currency),testId:'lumpsum'}),
+            _React.createElement(SliderInput,{label:'Monthly SIP',value:sip,min:0,max:500000,step:500,onChange:setSip,format:v=>fmtNum(v,currency),testId:'sip'}),
+            _React.createElement(SliderInput,{label:'SIP Step-Up %',value:stepUp,min:0,max:50,step:1,onChange:setStepUp,format:v=>v+'%',testId:'step-up'}),
+            _React.createElement(SliderInput,{label:'Annual Return %',value:annualReturn,min:1,max:100,step:0.5,onChange:setAnnualReturn,format:v=>v+'%',testId:'annual-return'}),
+            _React.createElement(SliderInput,{label:'Duration (Years)',value:duration,min:1,max:100,step:1,onChange:handleSetDuration,format:v=>v+' yrs',testId:'duration'}),
+            _React.createElement(SliderInput,{label:'SIP Stoppage Year',value:sipStopYear,min:1,max:duration,step:1,onChange:handleSetSipStop,format:v=>'Yr '+v,testId:'sip-stop'}),
+            _React.createElement(SliderInput,{label:'Withdrawal Start Year',value:withdrawalStartYear,min:sipStopYear,max:duration,step:1,onChange:setWithdrawalStartYear,format:v=>'Yr '+v,testId:'withdrawal-start'})
+          ),
+
+          _React.createElement('div',{className:'withdrawal-section'},
+            _React.createElement('div',{className:'withdrawal-title'},'Withdrawal Phase'),
+            _React.createElement(SliderInput,{label:'Withdrawal Return %',value:withdrawalReturn,min:1,max:50,step:0.5,onChange:setWithdrawalReturn,format:v=>v+'%',testId:'withdrawal-return'}),
+            _React.createElement(SliderInput,{label:'Monthly SWP',value:swp,min:0,max:500000,step:500,onChange:setSwp,format:v=>fmtNum(v,currency),testId:'swp'}),
+            _React.createElement(SliderInput,{label:'SWP Step-Up %',value:swpStepUp,min:0,max:30,step:1,onChange:setSwpStepUp,format:v=>v+'%',testId:'swp-stepup'})
+          )
+        ),
+
+        // RIGHT PROJECTION PANEL
+        _React.createElement('main',{className:'proj-panel','aria-label':'Wealth projection results'},
+
+          // METRIC CARDS
+          _React.createElement('div',{className:'metrics-grid'},
+            _React.createElement(MetricCard,{
+              label:'Total Investment',
+              value:f(proj.totalInvested),
+              sub:'Lumpsum + All SIPs',
+              testId:'metric-total-investment'
+            }),
+            _React.createElement(MetricCard,{
+              label:'Corpus \u00B7 SIP Stop · Yr '+sipStopYear,
+              value:f(proj.corpusAtSipStop),
+              sub:'At accumulation peak',
+              testId:'metric-corpus-sip-stop'
+            }),
+            _React.createElement(MetricCard,{
+              label:'Total SWP Withdrawn',
+              value:f(proj.totalWithdrawn),
+              sub:'Across withdrawal phase',
+              testId:'metric-total-swp'
+            }),
+            _React.createElement(MetricCard,{
+              label:'Final Corpus · Yr '+duration,
+              value:f(proj.finalCorpus),
+              sub:'End of projection',
+              accent:true,
+              testId:'metric-final-corpus'
+            })
+          ),
+
+          // SUPPORT STRIP
+          _React.createElement('div',{className:'support-strip'},
+            _React.createElement('div',{className:'support-item'},
+              _React.createElement('span',{className:'support-label'},'Total Returns (incl. withdrawn)'),
+              _React.createElement('span',{className:'support-value','data-testid':'metric-total-returns'},f(proj.totalReturns))
+            ),
+            _React.createElement('div',{className:'support-item'},
+              _React.createElement('span',{className:'support-label'},'Wealth Multiplier'),
+              _React.createElement('span',{className:'support-value','data-testid':'metric-multiplier'},proj.multiplier.toFixed(2)+'\u00D7')
+            ),
+            _React.createElement('div',{className:'support-item'},
+              _React.createElement('span',{className:'support-label'},'Accum. Return Rate'),
+              _React.createElement('span',{className:'support-value'},annualReturn+'% p.a.')
+            ),
+            _React.createElement('div',{className:'support-item'},
+              _React.createElement('span',{className:'support-label'},'Withdrawal Return Rate'),
+              _React.createElement('span',{className:'support-value'},withdrawalReturn+'% p.a.')
+            )
+          ),
+
+          // CHARTS
+          _React.createElement('div',{className:'charts-row'},
+
+            // LINE CHART — Corpus Growth
+            _React.createElement('div',{className:'chart-card'},
+              _React.createElement('div',{className:'chart-title'},'Corpus Growth'),
+              _React.createElement('div',{className:'chart-sub'},'Year-over-year portfolio value'),
+              _React.createElement(ResponsiveContainer,{width:'100%',height:220},
+                _React.createElement(LineChart,{data:chartData,margin:{top:4,right:8,left:0,bottom:0}},
+                  _React.createElement(CartesianGrid,{strokeDasharray:'3 3',stroke:'#F3F4F6',vertical:false}),
+                  _React.createElement(XAxis,{dataKey:'year',tick:tickStyle,tickLine:false,axisLine:{stroke:'#E5E7EB'}}),
+                  _React.createElement(YAxis,{tickFormatter:v=>fmtNum(v,currency),tick:tickStyle,tickLine:false,axisLine:false,width:62}),
+                  _React.createElement(Tooltip,{formatter:tooltipFmt,contentStyle:tooltipStyle}),
+                  _React.createElement(Line,{type:'monotone',dataKey:'corpus',stroke:'#064E3B',strokeWidth:1.5,dot:false,name:'Corpus'})
+                )
+              ),
+              _React.createElement('div',{className:'chart-legend'},
+                _React.createElement('div',{className:'legend-item'},
+                  _React.createElement('div',{className:'legend-dot',style:{background:'#064E3B'}}),
+                  'Corpus Value'
+                )
+              )
+            ),
+
+            // AREA CHART — Composition
+            _React.createElement('div',{className:'chart-card'},
+              _React.createElement('div',{className:'chart-title'},'Invested vs. Returns'),
+              _React.createElement('div',{className:'chart-sub'},'Composition of total portfolio'),
+              _React.createElement(ResponsiveContainer,{width:'100%',height:220},
+                _React.createElement(AreaChart,{data:chartData,margin:{top:4,right:8,left:0,bottom:0}},
+                  _React.createElement(CartesianGrid,{strokeDasharray:'3 3',stroke:'#F3F4F6',vertical:false}),
+                  _React.createElement(XAxis,{dataKey:'year',tick:tickStyle,tickLine:false,axisLine:{stroke:'#E5E7EB'}}),
+                  _React.createElement(YAxis,{tickFormatter:v=>fmtNum(v,currency),tick:tickStyle,tickLine:false,axisLine:false,width:62}),
+                  _React.createElement(Tooltip,{formatter:tooltipFmt,contentStyle:tooltipStyle}),
+                  _React.createElement(Area,{type:'monotone',dataKey:'invested',stackId:'1',stroke:'#9CA3AF',fill:'#F3F4F6',strokeWidth:1,name:'Invested'}),
+                  _React.createElement(Area,{type:'monotone',dataKey:'returns',stackId:'1',stroke:'#10B981',fill:'#D1FAE5',strokeWidth:1,name:'Returns'})
+                )
+              ),
+              _React.createElement('div',{className:'chart-legend'},
+                _React.createElement('div',{className:'legend-item'},
+                  _React.createElement('div',{className:'legend-dot',style:{background:'#9CA3AF'}}),
+                  'Invested'
+                ),
+                _React.createElement('div',{className:'legend-item'},
+                  _React.createElement('div',{className:'legend-dot',style:{background:'#10B981'}}),
+                  'Returns'
+                )
+              )
+            )
+          ),
+
+          // TABLE
+          _React.createElement('div',{className:'table-card'},
+            _React.createElement('div',{className:'table-header-row'},
+              _React.createElement('span',{className:'table-title'},'Year-by-Year Breakdown'),
+              _React.createElement('div',{className:'phase-legend'},
+                _React.createElement('span',{className:'phase-pip'},
+                  _React.createElement('span',{className:'phase-pip-dot',style:{background:'#9CA3AF'}}),
+                  'Phase 1: Accumulation'
+                ),
+                _React.createElement('span',{className:'phase-pip'},
+                  _React.createElement('span',{className:'phase-pip-dot',style:{background:'#93C5FD'}}),
+                  'Phase 2: Compounding'
+                ),
+                _React.createElement('span',{className:'phase-pip'},
+                  _React.createElement('span',{className:'phase-pip-dot',style:{background:'#10B981'}}),
+                  'Phase 3: Withdrawal'
+                )
+              )
+            ),
+            _React.createElement('div',{className:'table-wrap'},
+              _React.createElement('table',{'aria-label':'Year-by-year wealth projection breakdown'},
+                _React.createElement('thead',null,
+                  _React.createElement('tr',null,
+                    ['Year','SIP (Year)','Total Invested','Withdrawn','Returns','Corpus'].map(h=>
+                      _React.createElement('th',{key:h},h)
+                    )
+                  )
+                ),
+                _React.createElement('tbody',null,
+                  proj.rows.map(r=>{
+                    let phase='phase-1';
+                    if(r.year>sipStopYear&&r.year<withdrawalStartYear)phase='phase-2';
+                    else if(r.year>=withdrawalStartYear)phase='phase-3';
+                    return _React.createElement('tr',{
+                      key:r.year,
+                      className:phase,
+                      'data-testid':'table-row-'+r.year
+                    },
+                      _React.createElement('td',null,'Yr '+r.year),
+                      _React.createElement('td',null,r.sip>0?ff(r.sip):'\u2014'),
+                      _React.createElement('td',null,ff(r.totalInvested)),
+                      _React.createElement('td',null,r.withdrawn>0?ff(r.withdrawn):'\u2014'),
+                      _React.createElement('td',null,ff(Math.max(0,r.returns))),
+                      _React.createElement('td',null,ff(r.corpus))
+                    );
+                  })
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      // FOOTER
+      _React.createElement('footer',{className:'site-footer'},
+        _React.createElement('span',{className:'footer-text'},'Heritage Wealth \u00B7 Private Office \u00A9 '+new Date().getFullYear()),
+        _React.createElement('span',{className:'footer-disclaimer'},'This projection is illustrative and does not constitute financial advice. Past returns do not guarantee future performance.')
+      )
+    );
+  }
+
+  _ReactDOM.createRoot(document.getElementById('root')).render(_React.createElement(App));
+})();
+</script>
+</body>
+</html>
